@@ -54,6 +54,7 @@ $app->command('sync repository', function ($repository, OutputInterface $output)
     // Fetch data for all issues found in the database that are not already processed
     // If you need to refresh all issues, truncate the zenhub_issues table
     $statement = $db->query('SELECT * FROM github_issues WHERE id NOT IN (SELECT id FROM zenhub_issues)');
+    $nbIssues = 0;
     while ($issue = $statement->fetch()) {
         $issueId = $issue['id'];
         $output->writeln(sprintf('Synchronizing issue <info>#%d</info>', $issueId));
@@ -77,7 +78,10 @@ MYSQL;
             'id' => $issueId,
             'estimate' => isset($zenhubData['estimate']['value']) ? floatval($zenhubData['estimate']['value']) : null,
         ]);
+        $nbIssues++;
     }
+
+    $output->writeln(sprintf('<comment>%d issues synchronized</comment>', $nbIssues));
 });
 
 $app->command('db-init [--force]', function ($force, OutputInterface $output) use ($db) {
