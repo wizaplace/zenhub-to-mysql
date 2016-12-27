@@ -64,6 +64,7 @@ $app->command('sync repository', function ($repository, OutputInterface $output)
             ],
         ]);
         $zenhubData = json_decode((string) $response->getBody(), true);
+        usleep(600*1000); // wait 600ms because we can hit the ZenHub API 100 times per minute
 
         $sql = <<<MYSQL
 INSERT INTO zenhub_issues (id, estimate)
