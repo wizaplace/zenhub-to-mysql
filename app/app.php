@@ -51,8 +51,9 @@ $app->command('sync repository', function ($repository, OutputInterface $output)
     $repositoryInfo = json_decode((string) $response->getBody(), true);
     $repositoryId = $repositoryInfo['id'];
 
-    // Fetch data for all issues found in the database
-    $statement = $db->query('SELECT * FROM github_issues');
+    // Fetch data for all issues found in the database that are not already processed
+    // If you need to refresh all issues, truncate the zenhub_issues table
+    $statement = $db->query('SELECT * FROM github_issues WHERE id NOT IN (SELECT id FROM zenhub_issues)');
     while ($issue = $statement->fetch()) {
         $issueId = $issue['id'];
         $output->writeln(sprintf('Synchronizing issue <info>#%d</info>', $issueId));
